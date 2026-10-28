@@ -5,7 +5,7 @@ import NotinhasCore
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private let store = NoteStore()
     private var controllers: [NoteWindowController] = []
-    private var hotKey: HotKey?
+    private var hotKeys: [HotKey] = []
     private var cornerTab: CornerTab?
     private var terminationSource: DispatchSourceSignal?
 
@@ -33,9 +33,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             bringAllToFront()
         }
 
-        hotKey = HotKey(keyCode: kVK_ANSI_N, modifiers: controlKey | optionKey) { [weak self] in
-            self?.createNote(near: nil)
-        }
+        hotKeys = [
+            HotKey(keyCode: kVK_ANSI_N, modifiers: controlKey | optionKey) { [weak self] in self?.createNote(near: nil) },
+            HotKey(keyCode: kVK_ANSI_M, modifiers: controlKey | optionKey) { [weak self] in self?.showNotes() },
+        ].compactMap { $0 }
         LoginItem.enableOnFirstRun()
         terminateOnSIGTERM()
     }

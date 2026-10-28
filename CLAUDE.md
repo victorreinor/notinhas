@@ -34,7 +34,7 @@ Com só as Command Line Tools, o `swift test` puro falha de forma intermitente c
 | `Sources/Notinhas/MarkdownStyler.swift` | Estilização ao vivo: só atributos, nunca caracteres. |
 | `Sources/Notinhas/MainMenu.swift` | Menu principal invisível — é ele que faz ⌘C/⌘V/⌘Z/⌘B funcionarem. |
 | `Sources/Notinhas/ColorPicker.swift` | Paleta das 7 cores e o popover de cor/opacidade. |
-| `Sources/Notinhas/HotKey.swift` / `LoginItem.swift` | ⌃⌥N global (Carbon) / abrir ao iniciar (`SMAppService`). |
+| `Sources/Notinhas/HotKey.swift` / `LoginItem.swift` | ⌃⌥N (nova nota) e ⌃⌥M (mostrar as notas) globais, via Carbon / abrir ao iniciar (`SMAppService`). |
 | `Sources/Notinhas/CornerTab.swift` | Aba no canto inferior direito, como a Nota Rápida: monitor global de mouse + `NSPanel` que não ativa o app. |
 | `Sources/Notinhas/Snapshot.swift` | Ferramenta de dev: renderiza as imagens do README fora da tela. |
 | `install.sh` | Instalador de um comando para usuários finais (baixa a última Release). |
@@ -64,6 +64,7 @@ Com só as Command Line Tools, o `swift test` puro falha de forma intermitente c
 - `bringAllToFront()` faz as notas subirem com fade (`NoteWindowController.rise`). Animar o frame dispara `windowDidMove`, por isso `isRising` ignora esses movimentos: senão, só mostrar as notas salvaria posições intermediárias e mudaria o `updatedAt`.
 - O ⌘Q chama `AppDelegate.quitOrHide`, que olha `MainMenu.quitKeyHides`. Não recuse `terminate` em `applicationShouldTerminate`: logout e desligar o Mac mandam o app sair por ali. O painel da aba tem `canHide = false` para continuar aparecendo com as notas escondidas, e `bringAllToFront`/`createNote` chamam `NSApp.unhide`.
 - `note.frame` é a **casa** da nota. `frameDidChange` só grava posição nova quando o mouse está pressionado (arrastar, redimensionar) ou quando a janela continua sobre a casa. Mover sem mouse para longe dela é o macOS ou `placeNotesOnScreens` abrindo espaço para um monitor que saiu, e aí só o tamanho é gravado. `placeNotesOnScreens` roda ao abrir e em `applicationDidChangeScreenParameters`.
+- `HotKey`: todo handler Carbon recebe todo atalho apertado, então cada instância tem um id e devolve `eventNotHandledErr` para os dos outros.
 - Recolher desativa `bodyBottom` e trava a altura com `minSize`/`maxSize`; `expandedHeight` guarda a altura para restaurar.
 - O salvamento tem debounce de 0,4 s. `close()` cancela o save pendente antes de excluir (senão a nota "ressuscita"). SIGTERM vira `NSApp.terminate` para salvar o pendente (os scripts usam `pkill`).
 - Se o app abriu no login (Apple Event `keyAELaunchedAsLogInItem`), ele não cria nota nem rouba o foco.
@@ -76,7 +77,7 @@ Este ambiente não tem Xcode, e o terminal não tem permissão de Gravação de 
 1. `./scripts/test.sh` para a lógica.
 2. `./scripts/screenshots.sh` e **olhe** os PNGs em `docs/images/` para qualquer mudança visual. Para cenas novas, edite `Snapshot.swift`.
 3. `./scripts/install-dev.sh` e confira o comportamento com `pgrep -x Notinhas`, `lsappinfo info -only name "$(lsappinfo front)"` (app da frente), `ls ~/Library/Application\ Support/Notinhas/notes` e `sfltool dumpbtm | grep -A6 -i notinhas` (login item).
-4. O que exige mãos humanas: digitar, ⌘B, Enter em lista, clicar no checkbox, arrastar, redimensionar, recolher, cor/opacidade, alfinete sobre outro app, ⌃⌥N de outro app, aba do canto inferior direito, tirar e pôr o cabo de um monitor. Peça ao usuário para testar e diga isso explicitamente.
+4. O que exige mãos humanas: digitar, ⌘B, Enter em lista, clicar no checkbox, arrastar, redimensionar, recolher, cor/opacidade, alfinete sobre outro app, ⌃⌥N e ⌃⌥M de outro app, aba do canto inferior direito, tirar e pôr o cabo de um monitor. Peça ao usuário para testar e diga isso explicitamente.
 
 ## Release e distribuição
 

@@ -3,7 +3,7 @@
 ```
                      ┌──────────────────────────── Notinhas (app, AppKit) ───────────────────────────┐
  Spotlight / login ─▶│ AppDelegate ──open/create/delete──▶ NoteWindowController (1 por nota)         │
- ⌃⌥N (HotKey)      ─▶│   │  ▲ onChange(Note)                  ├─ NoteWindow (sem borda)              │
+ ⌃⌥N ⌃⌥M (HotKey)  ─▶│   │  ▲ onChange(Note)                  ├─ NoteWindow (sem borda)              │
  Canto (CornerTab) ─▶│   │  │                                  ├─ NoteHeaderView  + ● 📌 ⋯            │
                      │   │  └────────────────────────────────  ├─ título (NSTextField)                │
                      │   ▼                                     ├─ MarkdownTextView ── MarkdownStyler  │
@@ -21,7 +21,7 @@
 | Abertura com notas salvas | Abre todas as janelas e traz para frente. |
 | Abertura no login | Abre as janelas sem ativar o app. Sem notas, não cria nenhuma. |
 | Abrir de novo com o app rodando | `applicationShouldHandleReopen` → `bringAllToFront()` (ou cria uma nota, se não houver nenhuma). As notas sobem 28 pt com fade, em cascata (`rise`). |
-| ⌃⌥N em qualquer app | `HotKey` (Carbon `RegisterEventHotKey`, sem permissão de Acessibilidade) → nova nota. |
+| ⌃⌥N / ⌃⌥M em qualquer app | `HotKey` (Carbon `RegisterEventHotKey`, sem permissão de Acessibilidade) → nova nota / `showNotes()`. |
 | Monitor conectado ou desconectado | `applicationDidChangeScreenParameters` → `placeNotesOnScreens()`: `NotePlacement.targets` manda as notas cuja casa sumiu para uma cascata na tela do mouse e devolve as outras para casa. Também roda ao abrir o app. |
 | Mouse no canto inferior direito (se ligado no `⋯`) | `CornerTab`: monitor global de `.mouseMoved` (mouse não pede Acessibilidade, só teclado) → `HotCorner.screen` acha a tela → um `NSPanel` não ativante desliza a aba. Clique → `showNotes()`. A aba some quando o mouse sai dela e só volta depois que o mouse sai do canto. |
 | `+` / ⌘N | Nota nova à direita da atual (ou à esquerda, ou em cascata, o que couber na tela). |

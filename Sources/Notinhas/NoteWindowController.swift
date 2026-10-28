@@ -335,7 +335,7 @@ final class NoteWindowController: NSObject, NSWindowDelegate, NSTextViewDelegate
         add(note.collapsed ? "Expandir nota" : "Recolher nota", #selector(toggleCollapse))
         add(note.pinned ? "Desafixar" : "Fixar por cima de tudo", #selector(togglePin))
         menu.addItem(.separator())
-        add("Mostrar todas as notas", #selector(showAll))
+        add("Mostrar todas as notas", #selector(showAll), key: "m", modifiers: [.control, .option])
         add("Abrir ao iniciar o Mac", #selector(toggleLoginItem)).state = LoginItem.isEnabled ? .on : .off
         let corner = add("Abrir pelo canto da tela", #selector(toggleCornerTab))
         corner.state = cornerTab?.isEnabled == true ? .on : .off

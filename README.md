@@ -116,6 +116,7 @@ E mais:
 | Atalho | Ação |
 | --- | --- |
 | <kbd>⌃</kbd><kbd>⌥</kbd><kbd>N</kbd> | Nova nota **de qualquer app** |
+| <kbd>⌃</kbd><kbd>⌥</kbd><kbd>M</kbd> | Mostra todas as notas **de qualquer app** (o mesmo que clicar na aba do canto) |
 | <kbd>⌘</kbd><kbd>N</kbd> | Nova nota ao lado da atual |
 | <kbd>⌘</kbd><kbd>Q</kbd> | Esconde as notas, e o app continua rodando. Para o ⌘Q fechar o app, desligue a opção no menu **⋯** |
 | <kbd>⌘</kbd><kbd>B</kbd> · <kbd>⌘</kbd><kbd>I</kbd> · <kbd>⇧</kbd><kbd>⌘</kbd><kbd>X</kbd> | Negrito · itálico · tachado |
