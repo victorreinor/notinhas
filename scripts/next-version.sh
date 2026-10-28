@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Prints the next release version: the latest vX.Y.Z tag with one part bumped. The part is the
-# argument (patch, minor or major); with none or "auto", it's "[major]" or "[minor]" when a
-# commit message since that tag says so, and patch otherwise.
+# argument (patch, minor or major); with none or "auto", it's "[major]" or "[minor]" when the
+# subject (first line) of a commit since that tag says so, and patch otherwise. Only subjects
+# count, so a commit body can mention the markers without bumping anything.
 #
 #   ./scripts/next-version.sh          # 0.1.0 → 0.1.1
 #   ./scripts/next-version.sh minor    # 0.1.0 → 0.2.0
@@ -13,10 +14,10 @@ IFS=. read -r major minor patch <<< "${last#v}"
 
 bump="${1:-auto}"
 if [ "$bump" = auto ]; then
-  messages="$(git log ${last:+"$last..HEAD"} --format=%B)"
-  if grep -qF '[major]' <<< "$messages"; then
+  subjects="$(git log ${last:+"$last..HEAD"} --format=%s)"
+  if grep -qF '[major]' <<< "$subjects"; then
     bump=major
-  elif grep -qF '[minor]' <<< "$messages"; then
+  elif grep -qF '[minor]' <<< "$subjects"; then
     bump=minor
   else
     bump=patch

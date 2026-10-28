@@ -12,7 +12,8 @@ swift build                       # build debug
 ./scripts/build-app.sh            # build.noindex/Notinhas.app — release, universal (arm64 + x86_64), assinatura ad-hoc
 ./scripts/install-dev.sh          # compila, substitui /Applications/Notinhas.app e abre
 ./scripts/screenshots.sh          # regenera docs/images (imagens do README) renderizando as views reais
-./scripts/next-version.sh         # próxima versão (a partir da última tag vX.Y.Z)
+./scripts/release.sh              # testa, builda, cria a tag da próxima versão e a GitHub Release com Notinhas.zip
+./scripts/next-version.sh         # só mostra qual seria a próxima versão
 ```
 
 Com só as Command Line Tools, o `swift test` puro falha de forma intermitente com `plugin for module 'TestingMacros' not found`. O `scripts/test.sh` passa o `-plugin-path` certo, e `--build-system native` não acha o módulo `Testing`. O aviso `ld: warning: search path '.../Developer/Library/Frameworks' not found` é inofensivo.
@@ -36,7 +37,6 @@ Com só as Command Line Tools, o `swift test` puro falha de forma intermitente c
 | `Sources/Notinhas/CornerTab.swift` | Aba no canto inferior direito, como a Nota Rápida: monitor global de mouse + `NSPanel` que não ativa o app. |
 | `Sources/Notinhas/Snapshot.swift` | Ferramenta de dev: renderiza as imagens do README fora da tela. |
 | `install.sh` | Instalador de um comando para usuários finais (baixa a última Release). |
-| `.github/workflows/release.yml` | Publica uma Release a cada push na `main` que muda o app. |
 
 ## Decisões de produto — não mudar sem perguntar ao dono
 
@@ -46,6 +46,7 @@ Com só as Command Line Tools, o `swift test` puro falha de forma intermitente c
 - Nota nova é amarela "marca-texto". Header pequeno: `+`, cor, alfinete, `⋯`.
 - Nota **sem** alfinete é janela normal: as outras janelas passam por cima. **Com** alfinete: `.floating` em todas as mesas e sobre apps em tela cheia.
 - Markdown fica como texto puro (portável); a sintaxe é só esmaecida, exceto marcadores de lista, desenhados como bolinha/checkbox.
+- Sem CI/CD (nada de GitHub Actions): testes e releases rodam localmente, com `scripts/test.sh` e `scripts/release.sh`.
 - Textos da interface em português (pt-BR); código, comentários e logs em inglês.
 - Não mudar o bundle id `dev.victorreinor.notinhas` nem a pasta `Notinhas` (preferências, login item e notas dos usuários dependem deles). Não mudar o nome do asset `Notinhas.zip` (o `install.sh` baixa `releases/latest/download/Notinhas.zip`).
 
@@ -76,7 +77,7 @@ Este ambiente não tem Xcode, e o terminal não tem permissão de Gravação de 
 
 ## Release e distribuição
 
-Automático: cada push na `main` que muda `Sources/`, `Resources/`, `Package.swift` ou `scripts/build-app.sh` dispara `.github/workflows/release.yml` (runner macOS), que testa, calcula a versão com `scripts/next-version.sh`, builda e publica a Release `vX.Y.Z` com `Notinhas.zip` e a lista de commits como notas. A versão sobe o patch; `[minor]` ou `[major]` na mensagem de um commit sobe essa parte, e `[skip ci]` pula a release. Para disparar à mão: `gh workflow run release.yml -f bump=minor`.
+Rode `./scripts/release.sh` com tudo commitado: ele testa, calcula a versão com `scripts/next-version.sh`, builda, cria a tag `vX.Y.Z` e publica a GitHub Release com `Notinhas.zip` e os títulos dos commits desde a tag anterior como notas. A versão sobe o patch; `[minor]` ou `[major]` no título (primeira linha) de um commit desde a última tag sobe essa parte. Para escolher na hora: `./scripts/release.sh minor "notas"`. O projeto não tem CI/CD (decisão do dono): release é sempre local.
 
 A tag é a fonte da versão: **não** edite `CFBundleShortVersionString` no `Info.plist` (é placeholder). O `build-app.sh` grava `$VERSION` (ou a última tag) e o número do build (quantidade de commits) no app.
 

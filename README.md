@@ -156,7 +156,7 @@ Para apagar as notas também: `rm -rf ~/Library/Application\ Support/Notinhas`. 
 ./scripts/screenshots.sh    # regenera as imagens deste README
 ```
 
-Cada push na `main` que muda o app publica uma versão nova no GitHub Releases (veja [`release.yml`](.github/workflows/release.yml)). Por padrão sobe o último número (0.1.0 → 0.1.1). Para subir mais, ponha `[minor]` ou `[major]` na mensagem do commit.
+Para publicar uma versão nova no GitHub Releases, rode `./scripts/release.sh`. A versão sai sozinha da última tag: por padrão sobe o último número (0.1.0 → 0.1.1), e `[minor]` ou `[major]` no título de um commit sobe mais.
 
 - `Sources/NotinhasCore`: modelo, armazenamento e edições de markdown (puras e testadas)
 - `Sources/Notinhas`: o app AppKit (janelas, editor, atalhos, login item)
