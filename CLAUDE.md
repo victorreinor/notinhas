@@ -12,7 +12,7 @@ swift build                       # build debug
 ./scripts/build-app.sh            # build.noindex/Notinhas.app — release, universal (arm64 + x86_64), assinatura ad-hoc
 ./scripts/install-dev.sh          # compila, substitui /Applications/Notinhas.app e abre
 ./scripts/screenshots.sh          # regenera docs/images (imagens do README) renderizando as views reais
-./scripts/release.sh "notas"      # testa, builda, cria tag vX.Y.Z e GitHub Release com Notinhas.zip
+./scripts/next-version.sh         # próxima versão (a partir da última tag vX.Y.Z)
 ```
 
 Com só as Command Line Tools, o `swift test` puro falha de forma intermitente com `plugin for module 'TestingMacros' not found`. O `scripts/test.sh` passa o `-plugin-path` certo, e `--build-system native` não acha o módulo `Testing`. O aviso `ld: warning: search path '.../Developer/Library/Frameworks' not found` é inofensivo.
@@ -36,6 +36,7 @@ Com só as Command Line Tools, o `swift test` puro falha de forma intermitente c
 | `Sources/Notinhas/CornerTab.swift` | Aba no canto inferior direito, como a Nota Rápida: monitor global de mouse + `NSPanel` que não ativa o app. |
 | `Sources/Notinhas/Snapshot.swift` | Ferramenta de dev: renderiza as imagens do README fora da tela. |
 | `install.sh` | Instalador de um comando para usuários finais (baixa a última Release). |
+| `.github/workflows/release.yml` | Publica uma Release a cada push na `main` que muda o app. |
 
 ## Decisões de produto — não mudar sem perguntar ao dono
 
@@ -75,7 +76,11 @@ Este ambiente não tem Xcode, e o terminal não tem permissão de Gravação de 
 
 ## Release e distribuição
 
-Suba `CFBundleShortVersionString` em `Resources/Info.plist`, faça commit e rode `./scripts/release.sh "o que mudou"`. O app é assinado ad-hoc e **não é notarizado** (exigiria Apple Developer ID, US$ 99/ano). Por isso o `install.sh` remove o atributo de quarentena, e o README explica o caminho manual pelo Gatekeeper. Para notarizar no futuro: `codesign` com Developer ID + `xcrun notarytool` (que precisa do Xcode).
+Automático: cada push na `main` que muda `Sources/`, `Resources/`, `Package.swift` ou `scripts/build-app.sh` dispara `.github/workflows/release.yml` (runner macOS), que testa, calcula a versão com `scripts/next-version.sh`, builda e publica a Release `vX.Y.Z` com `Notinhas.zip` e a lista de commits como notas. A versão sobe o patch; `[minor]` ou `[major]` na mensagem de um commit sobe essa parte, e `[skip ci]` pula a release. Para disparar à mão: `gh workflow run release.yml -f bump=minor`.
+
+A tag é a fonte da versão: **não** edite `CFBundleShortVersionString` no `Info.plist` (é placeholder). O `build-app.sh` grava `$VERSION` (ou a última tag) e o número do build (quantidade de commits) no app.
+
+O app é assinado ad-hoc e **não é notarizado** (exigiria Apple Developer ID, US$ 99/ano). Por isso o `install.sh` remove o atributo de quarentena, e o README explica o caminho manual pelo Gatekeeper. Para notarizar no futuro: `codesign` com Developer ID + `xcrun notarytool` (que precisa do Xcode).
 
 ## Referências
 

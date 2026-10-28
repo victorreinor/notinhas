@@ -83,5 +83,5 @@ Um arquivo por nota em `~/Library/Application Support/Notinhas/notes/<UUID>.json
 ## Distribuição
 
 - `scripts/build-app.sh` monta o bundle à mão (sem Xcode): binário universal, `Info.plist`, ícone (`scripts/make-icon.swift` desenha o ícone e o `iconutil` gera o `.icns`) e `codesign --sign -`.
-- `scripts/release.sh` publica `Notinhas.zip` (feito com `ditto`, que preserva a assinatura) numa GitHub Release com tag `v<versão>`.
+- `.github/workflows/release.yml` roda a cada push na `main` que muda o app: `scripts/next-version.sh` sobe a última tag (patch, ou `[minor]`/`[major]` nas mensagens), `scripts/test.sh`, `build-app.sh` com `VERSION`, e publica `Notinhas.zip` (feito com `ditto`, que preserva a assinatura) numa GitHub Release `v<versão>`, com os commits desde a tag anterior como notas.
 - `install.sh` baixa `releases/latest/download/Notinhas.zip`, instala em `/Applications` (ou `~/Applications`), remove a quarentena e abre o app. Sem notarização, o Gatekeeper bloquearia um app baixado pelo navegador. Arquivos baixados com `curl` não recebem quarentena, e o `xattr -dr` é uma garantia extra.
