@@ -149,7 +149,7 @@ Para apagar as notas também: `rm -rf ~/Library/Application\ Support/Notinhas`. 
 ## Desenvolvimento
 
 ```sh
-swift test                  # testes da lógica de edição e da persistência
+./scripts/test.sh           # testes da lógica de edição e da persistência
 ./scripts/install-dev.sh    # compila e instala sua versão local
 ./scripts/screenshots.sh    # regenera as imagens deste README
 ./scripts/release.sh "…"    # publica uma nova versão no GitHub Releases

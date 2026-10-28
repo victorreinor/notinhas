@@ -8,14 +8,14 @@ Detalhes de arquitetura, ciclo de vida e formato dos dados: [docs/ARCHITECTURE.m
 
 ```sh
 swift build                       # build debug
-swift test                        # testes (Swift Testing) do NotinhasCore
+./scripts/test.sh                 # testes (Swift Testing) do NotinhasCore — use em vez de `swift test`
 ./scripts/build-app.sh            # build/Notinhas.app — release, universal (arm64 + x86_64), assinatura ad-hoc
 ./scripts/install-dev.sh          # compila, substitui /Applications/Notinhas.app e abre
 ./scripts/screenshots.sh          # regenera docs/images (imagens do README) renderizando as views reais
 ./scripts/release.sh "notas"      # testa, builda, cria tag vX.Y.Z e GitHub Release com Notinhas.zip
 ```
 
-O aviso `ld: warning: search path '.../Developer/Library/Frameworks' not found` no `swift test` é inofensivo.
+Com só as Command Line Tools, o `swift test` puro falha de forma intermitente com `plugin for module 'TestingMacros' not found`. O `scripts/test.sh` passa o `-plugin-path` certo, e `--build-system native` não acha o módulo `Testing`. O aviso `ld: warning: search path '.../Developer/Library/Frameworks' not found` é inofensivo.
 
 ## Mapa do código
 
@@ -61,7 +61,7 @@ O aviso `ld: warning: search path '.../Developer/Library/Frameworks' not found` 
 
 Este ambiente não tem Xcode, e o terminal não tem permissão de Gravação de Tela nem de Acessibilidade: não dá para tirar print nem clicar na UI.
 
-1. `swift test` para a lógica.
+1. `./scripts/test.sh` para a lógica.
 2. `./scripts/screenshots.sh` e **olhe** os PNGs em `docs/images/` para qualquer mudança visual. Para cenas novas, edite `Snapshot.swift`.
 3. `./scripts/install-dev.sh` e confira o comportamento com `pgrep -x Notinhas`, `lsappinfo info -only name "$(lsappinfo front)"` (app da frente), `ls ~/Library/Application\ Support/Notinhas/notes` e `sfltool dumpbtm | grep -A6 -i notinhas` (login item).
 4. O que exige mãos humanas: digitar, ⌘B, Enter em lista, clicar no checkbox, arrastar, redimensionar, recolher, cor/opacidade, alfinete sobre outro app, ⌃⌥N de outro app. Peça ao usuário para testar e diga isso explicitamente.

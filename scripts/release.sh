@@ -19,7 +19,7 @@ if git rev-parse "$tag" >/dev/null 2>&1; then
   exit 1
 fi
 
-swift test
+./scripts/test.sh
 ./scripts/build-app.sh
 rm -f build/Notinhas.zip
 ditto -c -k --keepParent build/Notinhas.app build/Notinhas.zip
