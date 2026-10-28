@@ -24,6 +24,7 @@ fi
 rm -f build/Notinhas.zip
 ditto -c -k --keepParent build/Notinhas.app build/Notinhas.zip
 
-git tag "$tag"
+# Annotated, so it also works when tag.gpgsign is on (signed tags need a message).
+git tag -a "$tag" -m "Notinhas $version"
 git push origin "$tag"
 gh release create "$tag" build/Notinhas.zip --title "Notinhas $version" --notes "$notes"
