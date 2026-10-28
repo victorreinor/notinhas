@@ -340,9 +340,13 @@ final class NoteWindowController: NSObject, NSWindowDelegate, NSTextViewDelegate
         let corner = add("Abrir pelo canto da tela", #selector(toggleCornerTab))
         corner.state = cornerTab?.isEnabled == true ? .on : .off
         corner.toolTip = "Leve o mouse ao canto inferior direito da tela e clique na nota que aparece"
+        let quitKey = add("⌘Q esconde as notas em vez de sair", #selector(toggleQuitKey))
+        quitKey.state = MainMenu.quitKeyHides ? .on : .off
+        quitKey.toolTip = "O app continua rodando, com a aba do canto e o ⌃⌥N. Para fechar, use Sair do Notinhas."
         menu.addItem(.separator())
         add("Excluir nota…", #selector(deleteNote))
-        add("Sair do Notinhas", #selector(quit), key: "q", modifiers: .command)
+        add("Esconder as notas", #selector(hideNotes), key: MainMenu.quitKeyHides ? "q" : "", modifiers: .command)
+        add("Sair do Notinhas", #selector(quit), key: MainMenu.quitKeyHides ? "" : "q", modifiers: .command)
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.isFlipped ? sender.bounds.maxY + 4 : -4), in: sender)
     }
 
@@ -370,6 +374,14 @@ final class NoteWindowController: NSObject, NSWindowDelegate, NSTextViewDelegate
             guard alert.runModal() == .alertFirstButtonReturn else { return }
         }
         onDelete?(self)
+    }
+
+    @objc private func toggleQuitKey() {
+        MainMenu.quitKeyHides.toggle()
+    }
+
+    @objc private func hideNotes() {
+        NSApp.hide(nil)
     }
 
     @objc private func quit() {

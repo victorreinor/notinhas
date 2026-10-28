@@ -105,7 +105,7 @@ E mais:
 | **+** | Nova nota ao lado |
 | **●** | Cor e opacidade |
 | **📌** | Fixar por cima de todas as janelas (de novo para soltar) |
-| **⋯** | Recolher, mostrar todas, abrir ao iniciar o Mac, abrir pelo canto da tela, excluir, sair |
+| **⋯** | Recolher, mostrar todas, abrir ao iniciar o Mac, abrir pelo canto da tela, o que o ⌘Q faz, excluir, esconder, sair |
 | Arrastar o topo | Mover a nota para qualquer lugar (inclusive outro monitor) |
 | Duplo clique no topo | Recolher / expandir |
 | Canto inferior direito | Redimensionar |
@@ -116,6 +116,7 @@ E mais:
 | --- | --- |
 | <kbd>⌃</kbd><kbd>⌥</kbd><kbd>N</kbd> | Nova nota **de qualquer app** |
 | <kbd>⌘</kbd><kbd>N</kbd> | Nova nota ao lado da atual |
+| <kbd>⌘</kbd><kbd>Q</kbd> | Esconde as notas, e o app continua rodando. Para o ⌘Q fechar o app, desligue a opção no menu **⋯** |
 | <kbd>⌘</kbd><kbd>B</kbd> · <kbd>⌘</kbd><kbd>I</kbd> · <kbd>⇧</kbd><kbd>⌘</kbd><kbd>X</kbd> | Negrito · itálico · tachado |
 | <kbd>⌘</kbd><kbd>E</kbd> · <kbd>⌘</kbd><kbd>K</kbd> | Código · link |
 | <kbd>⌘</kbd><kbd>1</kbd> <kbd>⌘</kbd><kbd>2</kbd> <kbd>⌘</kbd><kbd>3</kbd> | Título grande, médio, pequeno |

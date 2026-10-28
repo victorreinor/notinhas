@@ -40,6 +40,7 @@ Com só as Command Line Tools, o `swift test` puro falha de forma intermitente c
 ## Decisões de produto — não mudar sem perguntar ao dono
 
 - Sem Dock, sem barra de menus, sem ⌘Tab. Abrir o app de novo (Spotlight/Finder) **traz todas as notas para frente**; sem notas, cria uma.
+- ⌘Q **esconde** as notas (`NSApp.hide`) em vez de sair, para a aba do canto e o ⌃⌥N continuarem funcionando. É uma opção ligada por padrão no `⋯` ("⌘Q esconde as notas em vez de sair", chave `quitKeyHides`); desligada, o ⌘Q fecha o app. "Sair do Notinhas" no `⋯` sempre fecha.
 - Aba do canto (menu `⋯` › "Abrir pelo canto da tela") vem **desligada**, porque o macOS já põe a Nota Rápida nesse canto. Encostar o mouse só mostra a aba; as notas vêm para frente ao **clicar**, para não roubar o foco de quem está digitando.
 - Nota nova é amarela "marca-texto". Header pequeno: `+`, cor, alfinete, `⋯`.
 - Nota **sem** alfinete é janela normal: as outras janelas passam por cima. **Com** alfinete: `.floating` em todas as mesas e sobre apps em tela cheia.
@@ -57,6 +58,7 @@ Com só as Command Line Tools, o `swift test` puro falha de forma intermitente c
 - **Novo atalho de teclado:** adicione no `MainMenu` (app `LSUIElement` sem menu principal não recebe key equivalents). Shift + número gera símbolo (⇧8 = `*`), por isso ⇧⌘8 é tratado por `keyCode` em `MarkdownTextView.performKeyEquivalent`.
 - Janela sem borda: `canBecomeKey` sobrescrito; arrastar pelo `NoteHeaderView.performDrag`; redimensionar pela `ResizeGrip`. O fundo é desenhado em `draw(_:)` (não em propriedades de layer) para o snapshot funcionar. Chame `invalidateShadow()` depois de mudar forma ou tamanho.
 - `bringAllToFront()` faz as notas subirem com fade (`NoteWindowController.rise`). Animar o frame dispara `windowDidMove`, por isso `isRising` ignora esses movimentos: senão, só mostrar as notas salvaria posições intermediárias e mudaria o `updatedAt`.
+- O ⌘Q chama `AppDelegate.quitOrHide`, que olha `MainMenu.quitKeyHides`. Não recuse `terminate` em `applicationShouldTerminate`: logout e desligar o Mac mandam o app sair por ali. O painel da aba tem `canHide = false` para continuar aparecendo com as notas escondidas, e `bringAllToFront`/`createNote` chamam `NSApp.unhide`.
 - Recolher desativa `bodyBottom` e trava a altura com `minSize`/`maxSize`; `expandedHeight` guarda a altura para restaurar.
 - O salvamento tem debounce de 0,4 s. `close()` cancela o save pendente antes de excluir (senão a nota "ressuscita"). SIGTERM vira `NSApp.terminate` para salvar o pendente (os scripts usam `pkill`).
 - Se o app abriu no login (Apple Event `keyAELaunchedAsLogInItem`), ele não cria nota nem rouba o foco.

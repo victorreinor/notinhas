@@ -58,6 +58,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         createNote(near: controllers.first { $0.window.isKeyWindow })
     }
 
+    /// ⌘Q from the hidden main menu.
+    @objc func quitOrHide(_ sender: Any?) {
+        if MainMenu.quitKeyHides {
+            NSApp.hide(nil)
+        } else {
+            NSApp.terminate(nil)
+        }
+    }
+
     // MARK: Notes
 
     @discardableResult
@@ -81,6 +90,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let note = Note(frame: frameForNewNote(near: source?.window))
         save(note)
         let controller = open(note)
+        NSApp.unhide(nil)
         NSApp.activate(ignoringOtherApps: true)
         controller.window.makeKeyAndOrderFront(nil)
         controller.focusBody()
@@ -114,6 +124,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         for (index, controller) in controllers.enumerated() {
             controller.rise(after: Double(index) * 0.04)
         }
+        NSApp.unhide(nil)
         NSApp.activate(ignoringOtherApps: true)
         controllers.forEach { $0.window.orderFrontRegardless() }
         key?.window.makeKeyAndOrderFront(nil)

@@ -24,7 +24,8 @@
 | ⌃⌥N em qualquer app | `HotKey` (Carbon `RegisterEventHotKey`, sem permissão de Acessibilidade) → nova nota. |
 | Mouse no canto inferior direito (se ligado no `⋯`) | `CornerTab`: monitor global de `.mouseMoved` (mouse não pede Acessibilidade, só teclado) → `HotCorner.screen` acha a tela → um `NSPanel` não ativante desliza a aba. Clique → `showNotes()`. A aba some quando o mouse sai dela e só volta depois que o mouse sai do canto. |
 | `+` / ⌘N | Nota nova à direita da atual (ou à esquerda, ou em cascata, o que couber na tela). |
-| Sair / SIGTERM | `applicationWillTerminate` → `flushPendingSave()` em todas as notas. |
+| ⌘Q | `quitOrHide`: por padrão `NSApp.hide` (as notas somem, mas o app segue rodando, com a aba do canto e o ⌃⌥N); com a opção desligada no `⋯`, sai. |
+| Sair (`⋯`, logout) / SIGTERM | `applicationWillTerminate` → `flushPendingSave()` em todas as notas. |
 
 Na primeira execução a partir de um `.app`, `LoginItem.enableOnFirstRun()` registra o login item uma vez (chave `loginItemConfigured` no UserDefaults). Depois disso, quem decide é o usuário, no menu `⋯` ou nos Ajustes do Sistema.
 

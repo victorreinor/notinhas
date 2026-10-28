@@ -6,7 +6,7 @@ enum MainMenu {
     static func make() -> NSMenu {
         let main = NSMenu()
         main.addItem(submenu("Notinhas", [
-            item("Sair do Notinhas", #selector(NSApplication.terminate(_:)), "q"),
+            item("Esconder ou sair", #selector(AppDelegate.quitOrHide(_:)), "q"),
         ]))
         main.addItem(submenu("Arquivo", [
             item("Nova nota", #selector(AppDelegate.newNote(_:)), "n"),
@@ -39,6 +39,13 @@ enum MainMenu {
             item("Checklist", #selector(MarkdownTextView.mdChecklist(_:)), "l", [.command, .shift]),
         ]))
         return main
+    }
+
+    /// What ⌘Q does, a switch in the ⋯ menu: hide the notes (the default, so the corner tab and
+    /// ⌃⌥N keep working) or quit.
+    static var quitKeyHides: Bool {
+        get { UserDefaults.standard.object(forKey: "quitKeyHides") as? Bool ?? true }
+        set { UserDefaults.standard.set(newValue, forKey: "quitKeyHides") }
     }
 
     private static func submenu(_ title: String, _ items: [NSMenuItem]) -> NSMenuItem {

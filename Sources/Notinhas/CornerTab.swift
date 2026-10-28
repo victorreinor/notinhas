@@ -101,6 +101,8 @@ final class CornerTab {
         panel.backgroundColor = .clear
         panel.hasShadow = true
         panel.hidesOnDeactivate = false
+        // Stays available while ⌘Q has the notes hidden.
+        panel.canHide = false
         panel.level = .statusBar
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
         let view = CornerTabView()
