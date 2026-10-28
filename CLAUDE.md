@@ -9,7 +9,7 @@ Detalhes de arquitetura, ciclo de vida e formato dos dados: [docs/ARCHITECTURE.m
 ```sh
 swift build                       # build debug
 ./scripts/test.sh                 # testes (Swift Testing) do NotinhasCore — use em vez de `swift test`
-./scripts/build-app.sh            # build/Notinhas.app — release, universal (arm64 + x86_64), assinatura ad-hoc
+./scripts/build-app.sh            # build.noindex/Notinhas.app — release, universal (arm64 + x86_64), assinatura ad-hoc
 ./scripts/install-dev.sh          # compila, substitui /Applications/Notinhas.app e abre
 ./scripts/screenshots.sh          # regenera docs/images (imagens do README) renderizando as views reais
 ./scripts/release.sh "notas"      # testa, builda, cria tag vX.Y.Z e GitHub Release com Notinhas.zip
@@ -56,6 +56,7 @@ Com só as Command Line Tools, o `swift test` puro falha de forma intermitente c
 - Recolher desativa `bodyBottom` e trava a altura com `minSize`/`maxSize`; `expandedHeight` guarda a altura para restaurar.
 - O salvamento tem debounce de 0,4 s. `close()` cancela o save pendente antes de excluir (senão a nota "ressuscita"). SIGTERM vira `NSApp.terminate` para salvar o pendente (os scripts usam `pkill`).
 - Se o app abriu no login (Apple Event `keyAELaunchedAsLogInItem`), ele não cria nota nem rouba o foco.
+- A saída do build fica em `build.noindex/`, não `build/`: o sufixo `.noindex` impede o Spotlight de mostrar um segundo "Notinhas" ao lado do de `/Applications`.
 
 ## Verificando uma mudança
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Publishes a GitHub release with build/Notinhas.zip, tagged with CFBundleShortVersionString
+# Publishes a GitHub release with build.noindex/Notinhas.zip, tagged with CFBundleShortVersionString
 # from Resources/Info.plist (bump it there first). install.sh always fetches the latest release.
 #
 #   ./scripts/release.sh "Notas desta versão"
@@ -21,10 +21,10 @@ fi
 
 ./scripts/test.sh
 ./scripts/build-app.sh
-rm -f build/Notinhas.zip
-ditto -c -k --keepParent build/Notinhas.app build/Notinhas.zip
+rm -f build.noindex/Notinhas.zip
+ditto -c -k --keepParent build.noindex/Notinhas.app build.noindex/Notinhas.zip
 
 # Annotated, so it also works when tag.gpgsign is on (signed tags need a message).
 git tag -a "$tag" -m "Notinhas $version"
 git push origin "$tag"
-gh release create "$tag" build/Notinhas.zip --title "Notinhas $version" --notes "$notes"
+gh release create "$tag" build.noindex/Notinhas.zip --title "Notinhas $version" --notes "$notes"

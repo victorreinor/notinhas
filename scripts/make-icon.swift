@@ -1,4 +1,4 @@
-// Draws the app icon into an .iconset folder: swift scripts/make-icon.swift build/AppIcon.iconset
+// Draws the app icon into an .iconset folder: swift scripts/make-icon.swift build.noindex/AppIcon.iconset
 import AppKit
 
 let output = URL(fileURLWithPath: CommandLine.arguments[1])

@@ -8,6 +8,6 @@ swift build --product Notinhas
 mkdir -p docs/images
 NOTINHAS_SNAPSHOT_DIR="$PWD/docs/images" "$(swift build --show-bin-path)/Notinhas"
 
-swift scripts/make-icon.swift build/AppIcon.iconset
-cp build/AppIcon.iconset/icon_128x128@2x.png docs/images/icon.png
+swift scripts/make-icon.swift build.noindex/AppIcon.iconset
+cp build.noindex/AppIcon.iconset/icon_128x128@2x.png docs/images/icon.png
 ls -1 docs/images

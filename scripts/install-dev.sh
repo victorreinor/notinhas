@@ -12,7 +12,7 @@ if pkill -x Notinhas; then
   while pgrep -x Notinhas >/dev/null; do sleep 0.2; done
 fi
 rm -rf "$DEST"
-cp -R build/Notinhas.app "$DEST"
+cp -R build.noindex/Notinhas.app "$DEST"
 open "$DEST"
 
 echo "Installed $DEST"
