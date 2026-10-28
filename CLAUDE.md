@@ -24,6 +24,7 @@ Com só as Command Line Tools, o `swift test` puro falha de forma intermitente c
 | --- | --- |
 | `Sources/NotinhasCore/Note.swift` | Modelo `Note` + `NoteColor`. Decodificação tolerante (campo novo precisa de default no `init(from:)`). |
 | `Sources/NotinhasCore/NoteStore.swift` | Um JSON por nota em `~/Library/Application Support/Notinhas/notes/`. |
+| `Sources/NotinhasCore/NotePlacement.swift` | Para onde cada nota vai quando um monitor sai ou volta. Pura e testada. |
 | `Sources/NotinhasCore/HotCorner.swift` | Geometria do canto inferior direito (qual tela, monitores vizinhos). Pura e testada. |
 | `Sources/NotinhasCore/MarkdownEditing.swift` | **Toda** edição de texto por comando: negrito, listas, Enter/Backspace/Tab em listas, checkbox. Funções puras que devolvem `TextEdit`. |
 | `Sources/Notinhas/AppDelegate.swift` | Ciclo de vida: abrir notas, reabrir pelo Spotlight, login, atalho global, salvar, excluir, posição de nota nova. |
@@ -43,6 +44,7 @@ Com só as Command Line Tools, o `swift test` puro falha de forma intermitente c
 - Sem Dock, sem barra de menus, sem ⌘Tab. Abrir o app de novo (Spotlight/Finder) **traz todas as notas para frente**; sem notas, cria uma.
 - ⌘Q **esconde** as notas (`NSApp.hide`) em vez de sair, para a aba do canto e o ⌃⌥N continuarem funcionando. É uma opção ligada por padrão no `⋯` ("⌘Q esconde as notas em vez de sair", chave `quitKeyHides`); desligada, o ⌘Q fecha o app. "Sair do Notinhas" no `⋯` sempre fecha.
 - Aba do canto (menu `⋯` › "Abrir pelo canto da tela") vem **desligada**, porque o macOS já põe a Nota Rápida nesse canto. Encostar o mouse só mostra a aba; as notas vêm para frente ao **clicar**, para não roubar o foco de quem está digitando.
+- Monitor desconectado: as notas dele esperam em cascata na tela do mouse e voltam para o lugar quando ele volta. Arrastar ou redimensionar uma nota que está esperando faz do lugar novo a casa dela.
 - Nota nova é amarela "marca-texto". Header pequeno: `+`, cor, alfinete, `⋯`.
 - Nota **sem** alfinete é janela normal: as outras janelas passam por cima. **Com** alfinete: `.floating` em todas as mesas e sobre apps em tela cheia.
 - Markdown fica como texto puro (portável); a sintaxe é só esmaecida, exceto marcadores de lista, desenhados como bolinha/checkbox.
@@ -61,6 +63,7 @@ Com só as Command Line Tools, o `swift test` puro falha de forma intermitente c
 - Janela sem borda: `canBecomeKey` sobrescrito; arrastar pelo `NoteHeaderView.performDrag`; redimensionar pela `ResizeGrip`. O fundo é desenhado em `draw(_:)` (não em propriedades de layer) para o snapshot funcionar. Chame `invalidateShadow()` depois de mudar forma ou tamanho.
 - `bringAllToFront()` faz as notas subirem com fade (`NoteWindowController.rise`). Animar o frame dispara `windowDidMove`, por isso `isRising` ignora esses movimentos: senão, só mostrar as notas salvaria posições intermediárias e mudaria o `updatedAt`.
 - O ⌘Q chama `AppDelegate.quitOrHide`, que olha `MainMenu.quitKeyHides`. Não recuse `terminate` em `applicationShouldTerminate`: logout e desligar o Mac mandam o app sair por ali. O painel da aba tem `canHide = false` para continuar aparecendo com as notas escondidas, e `bringAllToFront`/`createNote` chamam `NSApp.unhide`.
+- `note.frame` é a **casa** da nota. `frameDidChange` só grava posição nova quando o mouse está pressionado (arrastar, redimensionar) ou quando a janela continua sobre a casa. Mover sem mouse para longe dela é o macOS ou `placeNotesOnScreens` abrindo espaço para um monitor que saiu, e aí só o tamanho é gravado. `placeNotesOnScreens` roda ao abrir e em `applicationDidChangeScreenParameters`.
 - Recolher desativa `bodyBottom` e trava a altura com `minSize`/`maxSize`; `expandedHeight` guarda a altura para restaurar.
 - O salvamento tem debounce de 0,4 s. `close()` cancela o save pendente antes de excluir (senão a nota "ressuscita"). SIGTERM vira `NSApp.terminate` para salvar o pendente (os scripts usam `pkill`).
 - Se o app abriu no login (Apple Event `keyAELaunchedAsLogInItem`), ele não cria nota nem rouba o foco.
@@ -73,7 +76,7 @@ Este ambiente não tem Xcode, e o terminal não tem permissão de Gravação de 
 1. `./scripts/test.sh` para a lógica.
 2. `./scripts/screenshots.sh` e **olhe** os PNGs em `docs/images/` para qualquer mudança visual. Para cenas novas, edite `Snapshot.swift`.
 3. `./scripts/install-dev.sh` e confira o comportamento com `pgrep -x Notinhas`, `lsappinfo info -only name "$(lsappinfo front)"` (app da frente), `ls ~/Library/Application\ Support/Notinhas/notes` e `sfltool dumpbtm | grep -A6 -i notinhas` (login item).
-4. O que exige mãos humanas: digitar, ⌘B, Enter em lista, clicar no checkbox, arrastar, redimensionar, recolher, cor/opacidade, alfinete sobre outro app, ⌃⌥N de outro app, aba do canto inferior direito. Peça ao usuário para testar e diga isso explicitamente.
+4. O que exige mãos humanas: digitar, ⌘B, Enter em lista, clicar no checkbox, arrastar, redimensionar, recolher, cor/opacidade, alfinete sobre outro app, ⌃⌥N de outro app, aba do canto inferior direito, tirar e pôr o cabo de um monitor. Peça ao usuário para testar e diga isso explicitamente.
 
 ## Release e distribuição
 

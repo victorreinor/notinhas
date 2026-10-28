@@ -95,6 +95,7 @@ Digite `**negrito**` e ele já aparece em negrito. Os símbolos ficam clarinhos,
 E mais:
 - **Abre junto com o Mac** e reabre cada nota onde ela estava.
 - **Discreto:** sem ícone no Dock e sem barra de menus. Abrir pelo Spotlight traz todas as notas pra frente.
+- **Vários monitores:** se você desconectar um monitor, as notas dele passam para a tela que ficou e voltam sozinhas para o lugar quando ele é reconectado.
 - **Canto da tela:** ligue no menu **⋯** e, ao levar o mouse ao canto inferior direito, aparece uma notinha; um clique traz todas as notas. Funciona como a Nota Rápida do Mac, então desligue a dela em **Ajustes do Sistema › Mesa e Dock › Cantos Ativos**.
 - **Leve:** app nativo (Swift + AppKit), sem Electron e sem navegador embutido.
 

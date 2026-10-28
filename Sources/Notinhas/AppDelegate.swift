@@ -23,6 +23,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         cornerTab = CornerTab { [weak self] in self?.showNotes() }
         let atLogin = launchedAsLoginItem
         store.loadAll().forEach { open($0) }
+        placeNotesOnScreens()
         if controllers.isEmpty {
             // First run (or every note deleted): open straight into a fresh note, except at login.
             if !atLogin { createNote(near: nil) }
@@ -43,6 +44,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         showNotes()
         return false
+    }
+
+    /// A monitor was plugged in or out, or the screens were rearranged.
+    func applicationDidChangeScreenParameters(_ notification: Notification) {
+        placeNotesOnScreens()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -71,11 +77,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @discardableResult
     private func open(_ note: Note) -> NoteWindowController {
-        var note = note
-        if !NSScreen.screens.contains(where: { $0.visibleFrame.intersects(note.frame) }) {
-            // Saved on a monitor that is no longer connected.
-            note.frame = frameForNewNote(near: nil, size: note.frame.size)
-        }
         let controller = NoteWindowController(note: note)
         controller.onChange = { [weak self] in self?.save($0) }
         controller.onNewNote = { [weak self] in self?.createNote(near: $0) }
@@ -128,6 +129,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
         controllers.forEach { $0.window.orderFrontRegardless() }
         key?.window.makeKeyAndOrderFront(nil)
+    }
+
+    /// Notes whose monitor is unplugged wait on the screen under the mouse and go back when it returns.
+    private func placeNotesOnScreens() {
+        let mouse = NSEvent.mouseLocation
+        guard let screen = NSScreen.screens.first(where: { $0.frame.contains(mouse) }) ?? NSScreen.screens.first else { return }
+        let targets = NotePlacement.targets(
+            homes: controllers.map(\.note.frame),
+            windows: controllers.map(\.window.frame),
+            screens: NSScreen.screens.map(\.visibleFrame),
+            fallback: screen.visibleFrame)
+        for (controller, target) in zip(controllers, targets) {
+            if let target { controller.window.setFrame(target, display: true) }
+        }
     }
 
     /// Next to the note whose "+" was clicked, or cascading from the top-right of the screen under the mouse.

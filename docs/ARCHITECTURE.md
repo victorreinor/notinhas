@@ -22,6 +22,7 @@
 | Abertura no login | Abre as janelas sem ativar o app. Sem notas, não cria nenhuma. |
 | Abrir de novo com o app rodando | `applicationShouldHandleReopen` → `bringAllToFront()` (ou cria uma nota, se não houver nenhuma). As notas sobem 28 pt com fade, em cascata (`rise`). |
 | ⌃⌥N em qualquer app | `HotKey` (Carbon `RegisterEventHotKey`, sem permissão de Acessibilidade) → nova nota. |
+| Monitor conectado ou desconectado | `applicationDidChangeScreenParameters` → `placeNotesOnScreens()`: `NotePlacement.targets` manda as notas cuja casa sumiu para uma cascata na tela do mouse e devolve as outras para casa. Também roda ao abrir o app. |
 | Mouse no canto inferior direito (se ligado no `⋯`) | `CornerTab`: monitor global de `.mouseMoved` (mouse não pede Acessibilidade, só teclado) → `HotCorner.screen` acha a tela → um `NSPanel` não ativante desliza a aba. Clique → `showNotes()`. A aba some quando o mouse sai dela e só volta depois que o mouse sai do canto. |
 | `+` / ⌘N | Nota nova à direita da atual (ou à esquerda, ou em cascata, o que couber na tela). |
 | ⌘Q | `quitOrHide`: por padrão `NSApp.hide` (as notas somem, mas o app segue rodando, com a aba do canto e o ⌃⌥N); com a opção desligada no `⋯`, sai. |
@@ -78,7 +79,7 @@ Um arquivo por nota em `~/Library/Application Support/Notinhas/notes/<UUID>.json
 }
 ```
 
-`frame` está em coordenadas de tela, com origem no canto inferior esquerdo da tela principal. Nota salva num monitor que foi desconectado é reposicionada ao abrir. Para adicionar campos, use `decodeIfPresent` com default em `Note.init(from:)`, assim notas antigas continuam abrindo.
+`frame` está em coordenadas de tela, com origem no canto inferior esquerdo da tela principal. `frame` é a casa da nota: com o monitor dela desconectado, a janela espera em outra tela sem mexer no `frame` salvo (só o tamanho acompanha), e volta quando o monitor volta. Para adicionar campos, use `decodeIfPresent` com default em `Note.init(from:)`, assim notas antigas continuam abrindo.
 
 ## Distribuição
 

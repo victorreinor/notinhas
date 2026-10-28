@@ -391,14 +391,25 @@ final class NoteWindowController: NSObject, NSWindowDelegate, NSTextViewDelegate
     // MARK: NSWindowDelegate
 
     func windowDidMove(_ notification: Notification) {
-        guard !isRising else { return }
-        note.frame = window.frame
-        noteChanged()
+        frameDidChange()
     }
 
     func windowDidResize(_ notification: Notification) {
-        note.frame = window.frame
         window.invalidateShadow()
+        frameDidChange()
+    }
+
+    /// Saves where the note is. A move away from the saved spot without the mouse is macOS or
+    /// `AppDelegate` making way for an unplugged monitor: only the size is saved then, so the note
+    /// can go back to that spot when the monitor returns.
+    private func frameDidChange() {
+        guard !isRising else { return }
+        var frame = window.frame
+        if NSEvent.pressedMouseButtons == 0 && !frame.intersects(note.frame) {
+            frame.origin = CGPoint(x: note.frame.minX, y: note.frame.maxY - frame.height)
+        }
+        guard frame != note.frame else { return }
+        note.frame = frame
         noteChanged()
     }
 
