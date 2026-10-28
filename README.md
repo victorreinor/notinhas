@@ -95,6 +95,7 @@ Digite `**negrito**` e ele já aparece em negrito. Os símbolos ficam clarinhos,
 E mais:
 - **Abre junto com o Mac** e reabre cada nota onde ela estava.
 - **Discreto:** sem ícone no Dock e sem barra de menus. Abrir pelo Spotlight traz todas as notas pra frente.
+- **Canto da tela:** ligue no menu **⋯** e, ao levar o mouse ao canto inferior direito, aparece uma notinha; um clique traz todas as notas. Funciona como a Nota Rápida do Mac, então desligue a dela em **Ajustes do Sistema › Mesa e Dock › Cantos Ativos**.
 - **Leve:** app nativo (Swift + AppKit), sem Electron e sem navegador embutido.
 
 ## Como usar
@@ -104,7 +105,7 @@ E mais:
 | **+** | Nova nota ao lado |
 | **●** | Cor e opacidade |
 | **📌** | Fixar por cima de todas as janelas (de novo para soltar) |
-| **⋯** | Recolher, mostrar todas, abrir ao iniciar o Mac, excluir, sair |
+| **⋯** | Recolher, mostrar todas, abrir ao iniciar o Mac, abrir pelo canto da tela, excluir, sair |
 | Arrastar o topo | Mover a nota para qualquer lugar (inclusive outro monitor) |
 | Duplo clique no topo | Recolher / expandir |
 | Canto inferior direito | Redimensionar |

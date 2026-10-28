@@ -23,6 +23,7 @@ Com só as Command Line Tools, o `swift test` puro falha de forma intermitente c
 | --- | --- |
 | `Sources/NotinhasCore/Note.swift` | Modelo `Note` + `NoteColor`. Decodificação tolerante (campo novo precisa de default no `init(from:)`). |
 | `Sources/NotinhasCore/NoteStore.swift` | Um JSON por nota em `~/Library/Application Support/Notinhas/notes/`. |
+| `Sources/NotinhasCore/HotCorner.swift` | Geometria do canto inferior direito (qual tela, monitores vizinhos). Pura e testada. |
 | `Sources/NotinhasCore/MarkdownEditing.swift` | **Toda** edição de texto por comando: negrito, listas, Enter/Backspace/Tab em listas, checkbox. Funções puras que devolvem `TextEdit`. |
 | `Sources/Notinhas/AppDelegate.swift` | Ciclo de vida: abrir notas, reabrir pelo Spotlight, login, atalho global, salvar, excluir, posição de nota nova. |
 | `Sources/Notinhas/NoteWindowController.swift` | Uma nota: monta as views, aplica cor/alfinete/recolher, menu `⋯`, salvamento com debounce. |
@@ -32,12 +33,14 @@ Com só as Command Line Tools, o `swift test` puro falha de forma intermitente c
 | `Sources/Notinhas/MainMenu.swift` | Menu principal invisível — é ele que faz ⌘C/⌘V/⌘Z/⌘B funcionarem. |
 | `Sources/Notinhas/ColorPicker.swift` | Paleta das 7 cores e o popover de cor/opacidade. |
 | `Sources/Notinhas/HotKey.swift` / `LoginItem.swift` | ⌃⌥N global (Carbon) / abrir ao iniciar (`SMAppService`). |
+| `Sources/Notinhas/CornerTab.swift` | Aba no canto inferior direito, como a Nota Rápida: monitor global de mouse + `NSPanel` que não ativa o app. |
 | `Sources/Notinhas/Snapshot.swift` | Ferramenta de dev: renderiza as imagens do README fora da tela. |
 | `install.sh` | Instalador de um comando para usuários finais (baixa a última Release). |
 
 ## Decisões de produto — não mudar sem perguntar ao dono
 
 - Sem Dock, sem barra de menus, sem ⌘Tab. Abrir o app de novo (Spotlight/Finder) **traz todas as notas para frente**; sem notas, cria uma.
+- Aba do canto (menu `⋯` › "Abrir pelo canto da tela") vem **desligada**, porque o macOS já põe a Nota Rápida nesse canto. Encostar o mouse só mostra a aba; as notas vêm para frente ao **clicar**, para não roubar o foco de quem está digitando.
 - Nota nova é amarela "marca-texto". Header pequeno: `+`, cor, alfinete, `⋯`.
 - Nota **sem** alfinete é janela normal: as outras janelas passam por cima. **Com** alfinete: `.floating` em todas as mesas e sobre apps em tela cheia.
 - Markdown fica como texto puro (portável); a sintaxe é só esmaecida, exceto marcadores de lista, desenhados como bolinha/checkbox.
@@ -53,6 +56,7 @@ Com só as Command Line Tools, o `swift test` puro falha de forma intermitente c
 - **Nova formatação:** escreva a função pura em `MarkdownEditing` com teste, e chame via `MarkdownTextView.apply(_:)`, que passa por `shouldChangeText`/`didChangeText` (desfazer + salvar). Não altere `textStorage` direto.
 - **Novo atalho de teclado:** adicione no `MainMenu` (app `LSUIElement` sem menu principal não recebe key equivalents). Shift + número gera símbolo (⇧8 = `*`), por isso ⇧⌘8 é tratado por `keyCode` em `MarkdownTextView.performKeyEquivalent`.
 - Janela sem borda: `canBecomeKey` sobrescrito; arrastar pelo `NoteHeaderView.performDrag`; redimensionar pela `ResizeGrip`. O fundo é desenhado em `draw(_:)` (não em propriedades de layer) para o snapshot funcionar. Chame `invalidateShadow()` depois de mudar forma ou tamanho.
+- `bringAllToFront()` faz as notas subirem com fade (`NoteWindowController.rise`). Animar o frame dispara `windowDidMove`, por isso `isRising` ignora esses movimentos: senão, só mostrar as notas salvaria posições intermediárias e mudaria o `updatedAt`.
 - Recolher desativa `bodyBottom` e trava a altura com `minSize`/`maxSize`; `expandedHeight` guarda a altura para restaurar.
 - O salvamento tem debounce de 0,4 s. `close()` cancela o save pendente antes de excluir (senão a nota "ressuscita"). SIGTERM vira `NSApp.terminate` para salvar o pendente (os scripts usam `pkill`).
 - Se o app abriu no login (Apple Event `keyAELaunchedAsLogInItem`), ele não cria nota nem rouba o foco.
@@ -65,7 +69,7 @@ Este ambiente não tem Xcode, e o terminal não tem permissão de Gravação de 
 1. `./scripts/test.sh` para a lógica.
 2. `./scripts/screenshots.sh` e **olhe** os PNGs em `docs/images/` para qualquer mudança visual. Para cenas novas, edite `Snapshot.swift`.
 3. `./scripts/install-dev.sh` e confira o comportamento com `pgrep -x Notinhas`, `lsappinfo info -only name "$(lsappinfo front)"` (app da frente), `ls ~/Library/Application\ Support/Notinhas/notes` e `sfltool dumpbtm | grep -A6 -i notinhas` (login item).
-4. O que exige mãos humanas: digitar, ⌘B, Enter em lista, clicar no checkbox, arrastar, redimensionar, recolher, cor/opacidade, alfinete sobre outro app, ⌃⌥N de outro app. Peça ao usuário para testar e diga isso explicitamente.
+4. O que exige mãos humanas: digitar, ⌘B, Enter em lista, clicar no checkbox, arrastar, redimensionar, recolher, cor/opacidade, alfinete sobre outro app, ⌃⌥N de outro app, aba do canto inferior direito. Peça ao usuário para testar e diga isso explicitamente.
 
 ## Release e distribuição
 

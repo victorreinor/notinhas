@@ -14,6 +14,7 @@ final class NoteWindowController: NSObject, NSWindowDelegate, NSTextViewDelegate
     var onNewNote: ((NoteWindowController) -> Void)?
     var onDelete: ((NoteWindowController) -> Void)?
     var onShowAll: (() -> Void)?
+    var cornerTab: CornerTab?
 
     private let content = NoteContentView()
     private let header = NoteHeaderView()
@@ -27,6 +28,8 @@ final class NoteWindowController: NSObject, NSWindowDelegate, NSTextViewDelegate
     private let pinButton = IconButton(symbol: "pin", tooltip: "")
     private var bodyBottom: NSLayoutConstraint!
     private var pendingSave: DispatchWorkItem?
+    /// Set while `rise` animates the window, so the in-between frames aren't saved as moves.
+    private var isRising = false
 
     init(note: Note) {
         self.note = note
@@ -57,6 +60,25 @@ final class NoteWindowController: NSObject, NSWindowDelegate, NSTextViewDelegate
 
     func flushPendingSave() {
         if pendingSave != nil { saveNow() }
+    }
+
+    /// Fades the note in as it rises into place. Call it before ordering the window front.
+    func rise(after delay: TimeInterval) {
+        guard !isRising else { return }
+        isRising = true
+        let target = window.frame
+        window.alphaValue = 0
+        window.setFrame(target.offsetBy(dx: 0, dy: -28), display: false)
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [self] in
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = 0.32
+                context.timingFunction = CAMediaTimingFunction(controlPoints: 0.16, 1, 0.3, 1)
+                window.animator().setFrame(target, display: true)
+                window.animator().alphaValue = CGFloat(note.opacity)
+            } completionHandler: { [self] in
+                isRising = false
+            }
+        }
     }
 
     func close() {
@@ -315,6 +337,9 @@ final class NoteWindowController: NSObject, NSWindowDelegate, NSTextViewDelegate
         menu.addItem(.separator())
         add("Mostrar todas as notas", #selector(showAll))
         add("Abrir ao iniciar o Mac", #selector(toggleLoginItem)).state = LoginItem.isEnabled ? .on : .off
+        let corner = add("Abrir pelo canto da tela", #selector(toggleCornerTab))
+        corner.state = cornerTab?.isEnabled == true ? .on : .off
+        corner.toolTip = "Leve o mouse ao canto inferior direito da tela e clique na nota que aparece"
         menu.addItem(.separator())
         add("Excluir nota…", #selector(deleteNote))
         add("Sair do Notinhas", #selector(quit), key: "q", modifiers: .command)
@@ -327,6 +352,10 @@ final class NoteWindowController: NSObject, NSWindowDelegate, NSTextViewDelegate
 
     @objc private func toggleLoginItem() {
         LoginItem.setEnabled(!LoginItem.isEnabled)
+    }
+
+    @objc private func toggleCornerTab() {
+        cornerTab?.isEnabled.toggle()
     }
 
     @objc private func deleteNote() {
@@ -350,6 +379,7 @@ final class NoteWindowController: NSObject, NSWindowDelegate, NSTextViewDelegate
     // MARK: NSWindowDelegate
 
     func windowDidMove(_ notification: Notification) {
+        guard !isRising else { return }
         note.frame = window.frame
         noteChanged()
     }

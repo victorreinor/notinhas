@@ -6,6 +6,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let store = NoteStore()
     private var controllers: [NoteWindowController] = []
     private var hotKey: HotKey?
+    private var cornerTab: CornerTab?
     private var terminationSource: DispatchSourceSignal?
 
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -19,6 +20,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
+        cornerTab = CornerTab { [weak self] in self?.showNotes() }
         let atLogin = launchedAsLoginItem
         store.loadAll().forEach { open($0) }
         if controllers.isEmpty {
@@ -39,11 +41,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// Opening the app again (Spotlight, Finder, `open`) while it runs brings every note forward.
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if controllers.isEmpty {
-            createNote(near: nil)
-        } else {
-            bringAllToFront()
-        }
+        showNotes()
         return false
     }
 
@@ -74,6 +72,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         controller.onNewNote = { [weak self] in self?.createNote(near: $0) }
         controller.onDelete = { [weak self] in self?.delete($0) }
         controller.onShowAll = { [weak self] in self?.bringAllToFront() }
+        controller.cornerTab = cornerTab
         controllers.append(controller)
         return controller
     }
@@ -101,8 +100,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    /// Every note forward, or a fresh one when there are none.
+    private func showNotes() {
+        if controllers.isEmpty {
+            createNote(near: nil)
+        } else {
+            bringAllToFront()
+        }
+    }
+
     private func bringAllToFront() {
         let key = controllers.first { $0.window.isKeyWindow } ?? controllers.last
+        for (index, controller) in controllers.enumerated() {
+            controller.rise(after: Double(index) * 0.04)
+        }
         NSApp.activate(ignoringOtherApps: true)
         controllers.forEach { $0.window.orderFrontRegardless() }
         key?.window.makeKeyAndOrderFront(nil)
